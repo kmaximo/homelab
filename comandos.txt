@@ -1,6 +1,6 @@
-#
+# Caso haja a necessidade install os progromas abaixo
 #sudo apt-get install network-manager network-manager-gnome
-sudo apt-get install acl -y
+#sudo apt-get install acl -y
 
 mkdir ~/docker
 sudo chmod 775 ~/docker
@@ -19,9 +19,14 @@ sudo chown root:root ~/docker/.env
 sudo chmod 600 ~/docker/.env
 
 touch ~/docker/docker-compose.yml
+
+mkdir ~/docker/appdata/docker-gc
 touch ~/docker/appdata/docker-gc/docker-gc-exclude
 
-mkdir /media/storage
-sudo chmod 775 /media/storage
-sudo setfacl -Rdm g:docker:rwx /media/storage
-sudo setfacl -Rm g:docker:rwx /media/storage
+mkdir /media/max/media/storage
+sudo chmod 775 mkdir /media/max/media/storage
+sudo setfacl -Rdm g:docker:rwx /media/max/media/storage
+sudo setfacl -Rm g:docker:rwx /media/max/media/storage
+
+
+sudo docker-compose -f ~/docker/docker-compose.yml up -d
