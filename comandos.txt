@@ -1,0 +1,27 @@
+#
+#sudo apt-get install network-manager network-manager-gnome
+sudo apt-get install acl -y
+
+mkdir ~/docker
+sudo chmod 775 ~/docker
+sudo setfacl -Rdm g:docker:rwx ~/docker
+sudo setfacl -Rm g:docker:rwx ~/docker
+
+mkdir ~/docker/shared
+mkdir ~/docker/secrets
+mkdir ~/docker/scripts
+mkdir ~/docker/logs
+mkdir ~/docker/appdata
+mkdir ~/docker/custom
+
+touch ~/docker/.env
+sudo chown root:root ~/docker/.env
+sudo chmod 600 ~/docker/.env
+
+touch ~/docker/docker-compose.yml
+touch ~/docker/appdata/docker-gc/docker-gc-exclude
+
+mkdir /media/storage
+sudo chmod 775 /media/storage
+sudo setfacl -Rdm g:docker:rwx /media/storage
+sudo setfacl -Rm g:docker:rwx /media/storage
