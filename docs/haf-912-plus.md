@@ -1,3 +1,4 @@
+
 # CoolerMaster HAF912 Plus // Mercury + Venus
 
 These small servers are perfect for an ITX sized homelab. They provide enough computing power for most tasks
@@ -9,6 +10,7 @@ and combined have 16GB of RAM. These servers were the first of my actual hardwar
 | -------------- | --- | --------- | ------------ | -------- |
 | Intel i5-6500T | 4GB | 250GB SSD | Debian 11.04 | Mercury  |
 | Intel i5-6500T | 4GB | 250GB SSD | Debian 10.00 | Venus    |
+
 
 ## Services
 
@@ -30,7 +32,6 @@ When listing what services are running, the hostname will be listed beside it.
 | WatchTower       | Automatic Docker Container Updates              |                   | Mercury |
 | Uptime Kuma      | Status Page & Monitoring Server                 |                   | Mercury |
 | VSCode           | VSCode Editing                                  |                   | Mercury |
-| OpenVPN          | VPN for connecting to Homelab from the internet |                   | Zeus   |
 
 !!!info
 
