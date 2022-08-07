@@ -1,4 +1,5 @@
-# Dell OptiPlex 7040 // Zeus + Hermes
+
+# CoolerMaster HAF912 Plus // Mercury + Venus
 
 These small servers are perfect for an ITX sized homelab. They provide enough computing power for most tasks
 and combined have 16GB of RAM. These servers were the first of my actual hardware I bought.
@@ -7,8 +8,9 @@ and combined have 16GB of RAM. These servers were the first of my actual hardwar
 
 | CPU            | RAM | Storage   | OS           | Hostname |
 | -------------- | --- | --------- | ------------ | -------- |
-| Intel i5-6500T | 8GB | 250GB SSD | Ubuntu 20.04 | Zeus     |
-| Intel i5-6500T | 8GB | 500GB HDD | Ubuntu 20.04 | Hermes   |
+| Intel i5-6500T | 4GB | 250GB SSD | Debian 11.04 | Mercury  |
+| Intel i5-6500T | 4GB | 250GB SSD | Debian 10.00 | Venus    |
+
 
 ## Services
 
@@ -19,29 +21,22 @@ When listing what services are running, the hostname will be listed beside it.
 
 | Service Name     | Description                                     | Highly Available? | Host   |
 | ---------------- | ----------------------------------------------- | ----------------- | ------ |
-| Traefik          | Reverse Proxy manager                           |                   | Hermes |
-| Unifi Controller | Controls and manages the Ubuiquiti Switch       |                   | Hermes |
-| Paperless-ng     | Document storage                                |                   | Hermes |
-| HedgeDoc         | Collaborative Markdown Editor                   |                   | Hermes |
-| ddclient         | IP address updater for Cloudflare               |                   | Hermes |
-| Tautulli         | Plex statistic tracker                          |                   | Hermes |
-| Overseerr        | Friendly user interface for Movies and TV shows |                   | Hermes |
-| Home Assistant   | Home Automation Software                        |                   | Hermes |
-| OpenVPN          | VPN for connecting to Homelab from the internet |                   | Zeus   |
+| Postgres         | Database                                        |                   | Mercury |
+| Heimdall         | Application Dashboard                           |                   | Mercury |
+| Jellyfin         | Media Server                                    |                   | Mercury |
+| Plex             | Media Server                                    |                   | Mercury |
+| Tautulli         | Plex Stats and Monitoring                       |                   | Mercury |
+| Dozzle           | Real-time Docker Log Viewer                     |                   | Mercury |
+| File Browser     | Home Automation Software                        |                   | Mercury |
+| Docker-GC        | Automatic Docker Garbage Collection             |                   | Mercury |
+| WatchTower       | Automatic Docker Container Updates              |                   | Mercury |
+| Uptime Kuma      | Status Page & Monitoring Server                 |                   | Mercury |
+| VSCode           | VSCode Editing                                  |                   | Mercury |
 
 !!!info
 
     Anything marked as Highly Available is run in either a hot-hot or hot-cold
     setup depending on the importance of the service.
-
-## Notes
-
-### Converting from Windows to New OS
-
-1. Create a bootable USB with desired operating system
-2. When booting up, press F2
-3. Allow "boot from USB" in BIOS
-4. Follow installer instructions
 
 ## Images
 
