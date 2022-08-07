@@ -39,4 +39,4 @@ Os serviços estaram listados junto com o hostname a qual ele pertence.
 
 ## Images
 
-![Optiplex](https://i.dbyte.xyz/2021-07-Iv.jpg)
+![Optiplex](https://cdn.coolermaster.com/media/assets/1021/912p_01-hover.png)
