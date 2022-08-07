@@ -1,26 +1,25 @@
 
 # CoolerMaster HAF912 Plus // Mercury + Venus
 
-These small servers are perfect for an ITX sized homelab. They provide enough computing power for most tasks
-and combined have 16GB of RAM. These servers were the first of my actual hardware I bought.
+Transformei meu antigo PC Gamer(que estava parado acumulando poeira) em servidor(Homelab), aproveitando
+toda a capacidade computacional para rodar todos os serviços instalados. 
 
-## Specifications
+
+## Especificações
 
 | CPU            | RAM | Storage   | OS           | Hostname |
 | -------------- | --- | --------- | ------------ | -------- |
-| Intel i5-6500T | 4GB | 250GB SSD | Debian 11.04 | Mercury  |
-| Intel i5-6500T | 4GB | 250GB SSD | Debian 10.00 | Venus    |
+| Intel i7-3770  | 4GB | 250GB SSD | Debian 11.04 | Mercury  |
+| Intel i7-3770  | 4GB | 250GB SSD | Debian 10.00 | Venus    |
+
+## Serviços
+
+Os serviços que estão em execução no HAF912, estão listados aqui. A lista é atualizada frequentemente.
+Os serviços estaram listados junto com o hostname a qual ele pertence.
 
 
-## Services
-
-The services running on the Dell OptiPlexes are listed here. This list is updated frequently.
-
-As my HomeLab has two quite similar Dell OptiPlexes, it can run many services in a hot-hot/hot-cold format.
-When listing what services are running, the hostname will be listed beside it.
-
-| Service Name     | Description                                     | Highly Available? | Host   |
-| ---------------- | ----------------------------------------------- | ----------------- | ------ |
+| Service Name     | Description                                     | Highly Available? | Host    |
+| ---------------- | ----------------------------------------------- | ----------------- | ------  |
 | Postgres         | Database                                        |                   | Mercury |
 | Heimdall         | Application Dashboard                           |                   | Mercury |
 | Jellyfin         | Media Server                                    |                   | Mercury |
@@ -41,5 +40,3 @@ When listing what services are running, the hostname will be listed beside it.
 ## Images
 
 ![Optiplex](https://i.dbyte.xyz/2021-07-Iv.jpg)
-![Optiplex](https://i.dbyte.xyz/2021-07-EX.jpg)
-![Optiplex](https://i.dbyte.xyz/2021-07-00.jpg)
