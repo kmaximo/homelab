@@ -29,7 +29,11 @@ sudo setfacl -Rm g:docker:rwx /media/max/media/storage]
 touch ~/docker/docker-compose.yml
 
 sudo docker-compose -f ~/docker/docker-compose.yml up -d
-
+sudo docker-compose -f ~/docker/docker-compose.yml stop CONTAINER-NAME
 sudo docker-compose -f ~/docker/docker-compose.yml down
+sudo docker ps -a
+sudo docker system prune
+sudo docker image prune
+sudo docker volume prune
 #executar comando abaixo para resolver erro de permissao na pasta do pgadmin
 sudo chown -R 5050:5050 ~/docker/appdata/pgadmin
