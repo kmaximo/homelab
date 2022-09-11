@@ -118,19 +118,32 @@ services:
       - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally.
     environment:
       - TZ=$TZ
-
-  # Heimdall - Application Dashboard
-  heimdall:
+  # Application Dashboard
+  homepage:
     <<: *common-keys-core # See EXTENSION FIELDS at the top
-    image: lscr.io/linuxserver/heimdall
-    container_name: heimdall
+    image: ghcr.io/benphelps/homepage:latest
+    container_name: homepage
+    networks:
+      - npm_proxy
     ports:
-      - "83:80" # 80 to 82 already taken by other services
-      # - "444:443" # 443 used by Nginx Proxy Manager. Disabled because we will put Heimdall behind proxy.
+      - 3000:3000
     volumes:
-      - $DOCKERDIR/appdata/heimdall:/config
+      - $DOCKERDIR/appdata/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations
     environment:
       <<: *default-tz-puid-pgid
+  # Heimdall - Application Dashboard
+  # heimdall:
+    # <<: *common-keys-core # See EXTENSION FIELDS at the top
+    # image: lscr.io/linuxserver/heimdall
+    # container_name: heimdall
+    # ports:
+      # - "83:80" # 80 to 82 already taken by other services
+      # # - "444:443" # 443 used by Nginx Proxy Manager. Disabled because we will put Heimdall behind proxy.
+    # volumes:
+      # - $DOCKERDIR/appdata/heimdall:/config
+    # environment:
+      # <<: *default-tz-puid-pgid
 
   # Jellyfin - Media Server
   jellyfin:
@@ -152,47 +165,47 @@ services:
       - /dev/shm:/data/transcode # Offload transcoding to RAM if you have enough RAM
 
   # Plex - Media Server
-  plexms:
-    <<: *common-keys-media # See EXTENSION FIELDS at the top
-    image: plexinc/pms-docker:public
-    container_name: plexms
-    ports:
-      - "32400:32400/tcp"
-      - "3005:3005/tcp"
-      - "8324:8324/tcp"
-      - "32469:32469/tcp"
-      # - "1900:1900/udp" # Conflicts with xTeVe and Synology default ports
-      - "32410:32410/udp"
-      - "32412:32412/udp"
-      - "32413:32413/udp"
-      - "32414:32414/udp"
-      # - "33400:33400" # If you use Plex Web Tools
-    #devices:
-    #  - /dev/dri:/dev/dri # for harware transcoding
-    volumes:
-      - $DOCKERDIR/appdata/plexms:/config
-      - $DATADIR/media:/media
-      - /dev/shm:/transcode
-    environment:
-      TZ: $TZ
-      HOSTNAME: "dockerPlex"
-      PLEX_CLAIM_FILE: $PLEX_CLAIM
-      PLEX_UID: $PUID
-      PLEX_GID: $PGID
-      ADVERTISE_IP: http://$SERVER_IP:32400/
+  # plexms:
+    # <<: *common-keys-media # See EXTENSION FIELDS at the top
+    # image: plexinc/pms-docker:public
+    # container_name: plexms
+    # ports:
+      # - "32400:32400/tcp"
+      # - "3005:3005/tcp"
+      # - "8324:8324/tcp"
+      # - "32469:32469/tcp"
+      # # - "1900:1900/udp" # Conflicts with xTeVe and Synology default ports
+      # - "32410:32410/udp"
+      # - "32412:32412/udp"
+      # - "32413:32413/udp"
+      # - "32414:32414/udp"
+      # # - "33400:33400" # If you use Plex Web Tools
+    # #devices:
+    # #  - /dev/dri:/dev/dri # for harware transcoding
+    # volumes:
+      # - $DOCKERDIR/appdata/plexms:/config
+      # - $DATADIR/media:/media
+      # - /dev/shm:/transcode
+    # environment:
+      # TZ: $TZ
+      # HOSTNAME: "dockerPlex"
+      # PLEX_CLAIM_FILE: $PLEX_CLAIM
+      # PLEX_UID: $PUID
+      # PLEX_GID: $PGID
+      # ADVERTISE_IP: http://$SERVER_IP:32400/
 
   # Tautulli - Plex Stats and Monitoring
-  tautulli:
-    <<: *common-keys-media # See EXTENSION FIELDS at the top
-    image: linuxserver/tautulli:latest
-    container_name: tautulli
-    ports:
-      - "8181:8181"
-    volumes:
-      - $DOCKERDIR/appdata/tautulli/config:/config
-      - $DOCKERDIR/appdata/plexms/Library/Application Support/Plex Media Server/Logs:/logs:ro # For tautulli Plex log viewer
-    environment:
-      <<: *default-tz-puid-pgid
+  # tautulli:
+    # <<: *common-keys-media # See EXTENSION FIELDS at the top
+    # image: linuxserver/tautulli:latest
+    # container_name: tautulli
+    # ports:
+      # - "8181:8181"
+    # volumes:
+      # - $DOCKERDIR/appdata/tautulli/config:/config
+      # - $DOCKERDIR/appdata/plexms/Library/Application Support/Plex Media Server/Logs:/logs:ro # For tautulli Plex log viewer
+    # environment:
+      # <<: *default-tz-puid-pgid
 
   ############################# UTILITIES
  
@@ -219,6 +232,8 @@ services:
     <<: *common-keys-core # See EXTENSION FIELDS at the top
     image: filebrowser/filebrowser:s6
     container_name: filebrowser
+    networks:
+      - npm_proxy
     ports:
       - "82:80" # 80 and 81 are used by Nginx Proxy Manager
     volumes:
@@ -235,6 +250,8 @@ services:
     <<: *common-keys-apps # See EXTENSION FIELDS at the top
     image: clockworksoul/docker-gc-cron:latest
     container_name: docker-gc
+    networks:
+      - npm_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy and comment this line for improved security.
       - $DOCKERDIR/appdata/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude # Create empty file
@@ -253,6 +270,8 @@ services:
     <<: *common-keys-core # See EXTENSION FIELDS at the top
     image: containrrr/watchtower
     container_name: watchtower
+    networks:
+      - npm_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -278,25 +297,25 @@ services:
     ports:
       - 3001:3001
   # VSCode - VSCode Editing
-  vscode:
-    <<: *common-keys-core # See EXTENSION FIELDS at the top
-    image: lscr.io/linuxserver/code-server:latest
-    container_name: vscode
-    volumes:
-      - $DOCKERDIR:/data/docker
-      - $USERDIR/server:/data/server
-      - $DATADIR:/data/data
-      - $DOCKERDIR/appdata/vscode:/config
-    environment:
-      <<: *default-tz-puid-pgid
-      #user: "0"
-      TZ: $TZ
-      # DOCKER_HOST: tcp://socket-proxy:2375
-      PASSWORD: 272502
-      # HASHED_PASSWORD: #optional
-      SUDO_PASSWORD: 2725021991 #optional
-      # SUDO_PASSWORD_HASH: #optional
-      # PROXY_DOMAIN: code-server.my.domain #optional
-      DEFAULT_WORKSPACE: /config/workspace #optional    
-    ports:
-      - 8443:8443
+  # vscode:
+    # <<: *common-keys-core # See EXTENSION FIELDS at the top
+    # image: lscr.io/linuxserver/code-server:latest
+    # container_name: vscode
+    # volumes:
+      # - $DOCKERDIR:/data/docker
+      # - $USERDIR/server:/data/server
+      # - $DATADIR:/data/data
+      # - $DOCKERDIR/appdata/vscode:/config
+    # environment:
+      # <<: *default-tz-puid-pgid
+      # #user: "0"
+      # TZ: $TZ
+      # # DOCKER_HOST: tcp://socket-proxy:2375
+      # PASSWORD: 272502
+      # # HASHED_PASSWORD: #optional
+      # SUDO_PASSWORD: 2725021991 #optional
+      # # SUDO_PASSWORD_HASH: #optional
+      # # PROXY_DOMAIN: code-server.my.domain #optional
+      # DEFAULT_WORKSPACE: /config/workspace #optional    
+    # ports:
+      # - 8443:8443
