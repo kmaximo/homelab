@@ -1,5 +1,0 @@
-engineering:
-  - docker/**/*
-  - docker/*
-  - docs/*
-  - docs/**/*
