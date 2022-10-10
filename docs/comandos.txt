@@ -33,7 +33,7 @@ touch ~/docker/appdata/docker-gc/docker-gc-exclude
 mkdir /media/max/media/storage
 sudo chmod 775 mkdir /media/max/media/storage
 sudo setfacl -Rdm g:docker:rwx /media/max/media/storage
-sudo setfacl -Rm g:docker:rwx /media/max/media/storage]
+sudo setfacl -Rm g:docker:rwx /media/max/media/storage
 
 touch ~/docker/docker-compose.yml
 
