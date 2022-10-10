@@ -1,6 +1,15 @@
 # Caso haja a necessidade install os programas abaixo
 #sudo apt-get install network-manager network-manager-gnome
 #sudo apt-get install acl -y
+#VSCode Debian
+#sudo apt-get install wget gpg
+#wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+#sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+#sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+#rm -f packages.microsoft.gpg
+#sudo apt install apt-transport-https
+#sudo apt update
+#sudo apt install code # or code-insiders
 
 mkdir ~/docker
 sudo chmod 775 ~/docker
@@ -31,9 +40,11 @@ touch ~/docker/docker-compose.yml
 sudo docker-compose -f ~/docker/docker-compose.yml up -d
 sudo docker-compose -f ~/docker/docker-compose.yml stop CONTAINER-NAME
 sudo docker-compose -f ~/docker/docker-compose.yml down
+
 sudo docker ps -a
 sudo docker system prune
 sudo docker image prune
 sudo docker volume prune
+
 #executar comando abaixo para resolver erro de permissao na pasta do pgadmin
 sudo chown -R 5050:5050 ~/docker/appdata/pgadmin
