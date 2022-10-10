@@ -68,39 +68,6 @@ services:
   ############################# FRONTENDS
 
   ############################# DB
-  database:
-    <<: *common-keys-core # See EXTENSION FIELDS at the top
-    container_name: db
-    image: postgres
-    restart: always
-    #user: postgres  # importante definir o usuário
-    volumes:
-      - $DOCKERDIR/appdata/postgresql/data:/var/lib/postgresql/data
-    environment:
-      - LC_ALL=C.UTF-8
-      - POSTGRES_PASSWORD=postgres  # senha padrão
-      - POSTGRES_USER=postgres  # usuário padrão
-      - POSTGRES_DB=db  # necessário porque foi configurado assim no settings
-    ports:
-      - 5432:5432  # repare na porta externa 5433
-    networks:
-      - npm_proxy
-
-  pgadmin:
-    <<: *common-keys-apps # See EXTENSION FIELDS at the top
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    restart: unless-stopped
-    volumes:
-       - $DOCKERDIR/appdata/pgadmin:/var/lib/pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - 5050:80
-    networks:
-      - npm_proxy
 
   # Portainer - WebUI for Containers
   portainer:
@@ -143,6 +110,68 @@ services:
       # - $DOCKERDIR/appdata/heimdall:/config
     # environment:
       # <<: *default-tz-puid-pgid
+
+  # Jellyfin - Media Server
+  jellyfin:
+    <<: *common-keys-media # See EXTENSION FIELDS at the top
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    #devices:
+    #  - /dev/dri:/dev/dri # for harware transcoding
+    ports:
+      - "8096:8096"
+      - "8920:8920" # Emby also uses same port if running both
+    environment:
+      <<: *default-tz-puid-pgid
+      UMASK_SET: 022
+    volumes:
+      - $DOCKERDIR/appdata/jellyfin:/config
+      - $DATADIR/downloads:/data/downloads
+      - $DATADIR/media:/data/media
+      - /dev/shm:/data/transcode # Offload transcoding to RAM if you have enough RAM
+
+  ##Plex - Media Server
+  plexms:
+    <<: *common-keys-media # See EXTENSION FIELDS at the top
+    image: plexinc/pms-docker:public
+    container_name: plexms
+    ports:
+      - "32400:32400/tcp"
+      - "3005:3005/tcp"
+      - "8324:8324/tcp"
+      - "32469:32469/tcp"
+      # - "1900:1900/udp" # Conflicts with xTeVe and Synology default ports
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      # - "33400:33400" # If you use Plex Web Tools
+    #devices:
+    #  - /dev/dri:/dev/dri # for harware transcoding
+    volumes:
+      - $DOCKERDIR/appdata/plexms:/config
+      - $DATADIR/media:/media
+      - /dev/shm:/transcode
+    environment:
+      TZ: $TZ
+      HOSTNAME: "dockerPlex"
+      PLEX_CLAIM_FILE: $PLEX_CLAIM
+      PLEX_UID: $PUID
+      PLEX_GID: $PGID
+      ADVERTISE_IP: http://$SERVER_IP:32400/
+
+  ##Tautulli - Plex Stats and Monitoring
+  tautulli:
+    <<: *common-keys-media # See EXTENSION FIELDS at the top
+    image: linuxserver/tautulli:latest
+    container_name: tautulli
+    ports:
+      - "8181:8181"
+    volumes:
+      - $DOCKERDIR/appdata/tautulli/config:/config
+      - $DOCKERDIR/appdata/plexms/Library/Application Support/Plex Media Server/Logs:/logs:ro # For tautulli Plex log viewer
+    environment:
+      <<: *default-tz-puid-pgid
 
   ############################# UTILITIES
 
@@ -231,28 +260,3 @@ services:
       - $DOCKERDIR/appdata/uptime-kuma:/app/data
     ports:
       - 3001:3001
-      
-  # VSCode - VSCode Editing
-  # vscode:
-    # <<: *common-keys-core # See EXTENSION FIELDS at the top
-    # image: lscr.io/linuxserver/code-server:latest
-    # container_name: vscode
-    # volumes:
-      # - $DOCKERDIR:/data/docker
-      # - $USERDIR/server:/data/server
-      # - $DATADIR:/data/data
-      # - $DOCKERDIR/appdata/vscode:/config
-    # environment:
-      # <<: *default-tz-puid-pgid
-      # #user: "0"
-      # TZ: $TZ
-      # # DOCKER_HOST: tcp://socket-proxy:2375
-      # PASSWORD: 272502
-      # # HASHED_PASSWORD: #optional
-      # SUDO_PASSWORD: 2725021991 #optional
-      # # SUDO_PASSWORD_HASH: #optional
-      # # PROXY_DOMAIN: code-server.my.domain #optional
-      # DEFAULT_WORKSPACE: /config/workspace #optional
-    # ports:
-      # - 8443:8443
-      
