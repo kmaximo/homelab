@@ -12,6 +12,9 @@
 #sudo apt install code # or code-insiders
 #sudo apt-get install git-all
 
+#Install Development tools on Debian
+#sudo apt install build-essential
+
 mkdir ~/docker
 sudo chmod 775 ~/docker
 sudo setfacl -Rdm g:docker:rwx ~/docker
