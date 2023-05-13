@@ -1,7 +1,7 @@
 
-# CoolerMaster HAF912 Plus // Mercury + Venus
+# CoolerMaster HAF912 Plus
 
-Transformei meu antigo PC Gamer(que estava parado acumulando poeira) em servidor(Homelab), aproveitando
+Transformação de antigo PC Gamer(que estava parado acumulando poeira) em Homelab, aproveitando
 toda a capacidade computacional para rodar todos os serviços instalados. 
 
 
