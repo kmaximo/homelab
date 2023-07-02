@@ -1,4 +1,4 @@
-# Caso haja a necessidade install os programas abaixo
+# Caso haja a necessidade instalar os programas abaixo
 #sudo apt-get install network-manager network-manager-gnome
 #sudo apt-get install acl -y
 #VSCode Debian
@@ -17,6 +17,7 @@
 
 mkdir ~/docker
 sudo chmod 775 ~/docker
+#sudo apt-get install acl -- Para Ubuntu
 sudo setfacl -Rdm g:docker:rwx ~/docker
 sudo setfacl -Rm g:docker:rwx ~/docker
 
