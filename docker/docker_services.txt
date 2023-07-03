@@ -1,4 +1,5 @@
-#How to Upgrade, Backup, and Restore Rancher 
+#How to Upgrade, Backup, and Restore Rancher  https://www.youtube.com/watch?v=YWqBxCIfxw4
+#https://ranchermanager.docs.rancher.com/pages-for-subheaders/rancher-on-a-single-node-with-docker#option-e-localhost-tunneling-no-certificate
 #Criar pasta para Backup
 mkdir ~/docker/appdata/rancher_backups
 
