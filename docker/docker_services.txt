@@ -1,0 +1,21 @@
+#How to Upgrade, Backup, and Restore Rancher 
+#Criar pasta para Backup
+mkdir ~/docker/appdata/rancher_backups
+
+#acessar a pasta criada
+cd ~/docker/appdata/rancher_backups
+
+#Executar o seguinte comando para criar Backup
+docker create --volumes-from <NOME DO CONTAINER> --name rancher-d
+ata-<ESCOLHER DATA> rancher/rancher:<VERSAO DO RANCHER>
+
+# Executar o seguinte comando para compactação da image
+docker run --volumes-from rancher-data-2<ESCOLHER DATA> -v $PWD:/bac
+kup:z busybox tar pzcvf /backup/rancher-data-backup-<VERSAO DO RANCHER>-<ESCOLHER DATA>.tar.gz /var/lib/rancher
+
+#Deletar docker images criadas nesses processo
+docker rm rancher-data-<ESCOLHER DATA>
+
+#Levantar o serviço do Rancher após o backup usando o nome do container do Rancher
+docker start <NOME DO CONTAINER>
+
