@@ -1,0 +1,239 @@
+version: "3.9"
+
+########################### NETWORKS
+# You may customize the network subnet (192.168.89.0/24) below as you please.
+# Docker Compose version 3.5 or higher required to define networks this way.
+
+networks:
+  default:
+    driver: bridge
+  npm_proxy:
+    name: npm_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+  # If you decide to use Socket Proxy, you need socket_proxy network as we. See https://www.smarthomebeginner.com/traefik-docker-security-best-practices/#9_Use_a_Docker_Socket_Proxy
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.101.0/24
+
+########################### SECRETS
+secrets:
+  htpasswd:
+    file: $DOCKERDIR/secrets/htpasswd
+  mysql_root_password:
+    file: $DOCKERDIR/secrets/mysql_root_password
+
+########################### EXTENSION FIELDS
+# Helps eliminate repetition of sections
+# More Info on how to use this: https://github.com/htpcBeginner/docker-traefik/pull/228
+
+# Common environment values
+x-environment: &default-tz-puid-pgid
+  TZ: $TZ
+  PUID: $PUID
+  PGID: $PGID
+
+# Keys common to some of the core services that we always to automatically restart on failure
+x-common-keys-core: &common-keys-core
+  networks:
+    - npm_proxy
+  security_opt:
+    - no-new-privileges:true
+  restart: always
+
+# Keys common to some of the dependent services/apps
+x-common-keys-apps: &common-keys-apps
+  networks:
+    - npm_proxy
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+
+# Keys common to some of the services in media-services.txt
+x-common-keys-media: &common-keys-media
+  networks:
+    - npm_proxy
+  security_opt:
+    - no-new-privileges:true
+  restart: "no"
+
+########################### SERVICES
+services:
+
+  ############################# DNS
+  bind9:
+    <<: *common-keys-apps
+    container_name: dns-demo-1
+    image: ubuntu/bind9:latest
+    environment:
+      - BIND9_USER=root
+      - TZ=$TZ
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - $DOCKERDIR/appdata/bind9/config:/etc/bind
+      - $DOCKERDIR/appdata/bind9/cache:/var/cache/bind
+      - $DOCKERDIR/appdata/bind9/records:/var/lib/bind
+    restart: unless-stopped
+
+  # Portainer - WebUI for Containers
+  portainer:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
+    # command: -H tcp://socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
+    networks:
+      - npm_proxy
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy and comment this line out, for improved security.
+      - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally.    environment:
+      - TZ=$TZ
+  # Application Dashboard
+  homepage:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    image: ghcr.io/benphelps/homepage:latest
+    container_name: homepage
+    networks:
+      - npm_proxy
+    ports:
+      - 3000:3000
+    volumes:
+      - $DOCKERDIR/appdata/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations
+    environment:
+      <<: *default-tz-puid-pgid
+  # Heimdall - Application Dashboard
+  # heimdall:
+    # <<: *common-keys-core # See EXTENSION FIELDS at the top
+    # image: lscr.io/linuxserver/heimdall
+    # container_name: heimdall
+    # ports:
+      # - "83:80" # 80 to 82 already taken by other services
+      # # - "444:443" # 443 used by Nginx Proxy Manager. Disabled because we will put Heimdall behind proxy.
+    # volumes:
+      # - $DOCKERDIR/appdata/heimdall:/config
+    # environment:
+      # <<: *default-tz-puid-pgid
+
+  ############################# UTILITIES
+
+  # Dozzle - Real-time Docker Log Viewer
+  dozzle:
+    <<: *common-keys-apps # See EXTENSION FIELDS at the top
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    networks:
+      - npm_proxy
+    ports:
+      - "8081:8080" # qBittorrent is using port 8080
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running"
+      # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label.
+      # DOCKER_HOST: tcp://socket-proxy:2375 # Use this instead if you have Socket Proxy enabled.
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy and comment this line for improved security.
+
+  # File Browser - Explorer
+  filebrowser:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    image: filebrowser/filebrowser:s6
+    container_name: filebrowser
+    networks:
+      - npm_proxy
+    ports:
+      - "82:80" # 80 and 81 are used by Nginx Proxy Manager
+    volumes:
+      - $DOCKERDIR/appdata/filebrowser:/config
+      - $USERDIR:/srv
+    environment:
+      <<: *default-tz-puid-pgid
+
+  ############################# MAINTENANCE
+
+  # Docker-GC - Automatic Docker Garbage Collection
+  # Create docker-gc-exclude file
+  dockergc:
+    <<: *common-keys-apps # See EXTENSION FIELDS at the top
+    image: clockworksoul/docker-gc-cron:latest
+    container_name: docker-gc
+    networks:
+      - npm_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy and comment this line for improved security.      - $DOCKERDIR/appdata/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude # Create empty file
+    environment:
+      CRON: 0 0 0 * * ? # Everyday at midnight. Previously 0 0 * * *
+      FORCE_IMAGE_REMOVAL: 1
+      FORCE_CONTAINER_REMOVAL: 0
+      GRACE_PERIOD_SECONDS: 604800
+      DRY_RUN: 0
+      CLEAN_UP_VOLUMES: 1
+      TZ: $TZ
+      # DOCKER_HOST: tcp://socket-proxy:2375 # Use this if you have Socket Proxy enabled.
+
+  # WatchTower - Automatic Docker Container Updates
+  watchtower:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    image: containrrr/watchtower
+    container_name: watchtower
+    networks:
+      - npm_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: $TZ
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_REMOVE_VOLUMES: "true"
+      WATCHTOWER_INCLUDE_STOPPED: "true"
+      WATCHTOWER_NO_STARTUP_MESSAGE: "false"
+      WATCHTOWER_SCHEDULE: "0 30 12 * * *" # Everyday at 12:30
+      # DOCKER_HOST: tcp://socket-proxy:2375 # Use this if you have Socket Proxy enabled.
+      DOCKER_API_VERSION: "1.40"
+
+  # Uptime Kuma - Status Page & Monitoring Server
+  uptime-kuma:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    image: louislam/uptime-kuma
+    container_name: uptime-kuma
+    networks:
+      - npm_proxy
+      - default
+    volumes:
+      - $DOCKERDIR/appdata/uptime-kuma:/app/data
+    ports:
+      - 3001:3001
+      
+  # VSCode - VSCode Editing
+  # vscode:
+    # <<: *common-keys-core # See EXTENSION FIELDS at the top
+    # image: lscr.io/linuxserver/code-server:latest
+    # container_name: vscode
+    # volumes:
+      # - $DOCKERDIR:/data/docker
+      # - $USERDIR/server:/data/server
+      # - $DATADIR:/data/data
+      # - $DOCKERDIR/appdata/vscode:/config
+    # environment:
+      # <<: *default-tz-puid-pgid
+      # #user: "0"
+      # TZ: $TZ
+      # # DOCKER_HOST: tcp://socket-proxy:2375
+      # PASSWORD: 272502
+      # # HASHED_PASSWORD: #optional
+      # SUDO_PASSWORD: 2725021991 #optional
+      # # SUDO_PASSWORD_HASH: #optional
+      # # PROXY_DOMAIN: code-server.my.domain #optional
+      # DEFAULT_WORKSPACE: /config/workspace #optional
+    # ports:
+      # - 8443:8443
+      

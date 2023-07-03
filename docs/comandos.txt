@@ -41,9 +41,9 @@ USERDIR="/home/usr"
 DOCKERDIR="/home/usr/docker"
 SECRETSDIR="/home/usr/docker/secrets"
 DATADIR="/media/storage"
-SERVER_IP=192.168.15.102
-PIHOLE_IP=192.168.15.102
-LOCAL_NETWORK=192.168.15.102
+SERVER_IP=192.168.0.0
+PIHOLE_IP=192.168.0.0
+LOCAL_NETWORK=192.168.0.0
 LOCAL_IPS=127.0.0.1/32,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
 
 mkdir ~/docker/appdata/docker-gc
